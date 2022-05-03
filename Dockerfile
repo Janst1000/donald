@@ -86,3 +86,5 @@ LABEL org.duckietown.label.module.type="${REPO_NAME}" \
     org.duckietown.label.maintainer="${MAINTAINER}"
 # <== Do not change the code above this line
 # <==================================================
+# copying an image to test publishing locally
+COPY ./packages/donald/src/image.png "${REPO_PATH}"
