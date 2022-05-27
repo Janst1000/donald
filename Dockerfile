@@ -47,6 +47,9 @@ ENV DT_REPO_PATH "${REPO_PATH}"
 ENV DT_LAUNCH_PATH "${LAUNCH_PATH}"
 ENV DT_LAUNCHER "${LAUNCHER}"
 
+# Fixing broken gpg ros key
+RUN sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys F42ED6FBAB17C654
+
 # install apt dependencies
 COPY ./dependencies-apt.txt "${REPO_PATH}/"
 RUN dt-apt-install ${REPO_PATH}/dependencies-apt.txt
@@ -60,6 +63,7 @@ RUN python3 -m pip install  -r ${REPO_PATH}/dependencies-py3.txt
 
 # copy the source code
 COPY ./packages "${REPO_PATH}/packages"
+
 
 # build packages
 RUN . /opt/ros/${ROS_DISTRO}/setup.sh && \
@@ -86,5 +90,3 @@ LABEL org.duckietown.label.module.type="${REPO_NAME}" \
     org.duckietown.label.maintainer="${MAINTAINER}"
 # <== Do not change the code above this line
 # <==================================================
-# copying an image to test publishing locally
-COPY ./packages/donald/src/image.png "${REPO_PATH}"
