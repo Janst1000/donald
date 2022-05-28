@@ -15,7 +15,7 @@ import roslib
 import rospy
 
 # Ros Messages
-from sensor_msgs.msg import Image
+from sensor_msgs.msg import Image, CompressedImage
 # We do not use cv_bridge it does not support CompressedImage in python
 from cv_bridge import CvBridge, CvBridgeError
 

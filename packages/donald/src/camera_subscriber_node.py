@@ -28,7 +28,7 @@ from sensor_msgs.msg import CompressedImage
 # We do not use cv_bridge it does not support CompressedImage in python
 # from cv_bridge import CvBridge, CvBridgeError
 
-VERBOSE=False
+VERBOSE=True
 
 class image_feature:
 
@@ -40,22 +40,23 @@ class image_feature:
         # self.bridge = CvBridge()
 
         # subscribed Topic
-        self.subscriber = rospy.Subscriber("/camera/image/compressed",
-            CompressedImage, self.callback,  queue_size = 1)
+        self.subscriber = rospy.Subscriber("/donald/camera_node/image/compressed",
+            CompressedImage, self.callback, buff_size=921600,  queue_size = 1)
         if VERBOSE :
-            print("subscribed to /camera/image/compressed")
+            print("subscribed to /donald/camera_node/image/compressed")
 
 
     def callback(self, ros_data):
         '''Callback function of subscribed topic. 
         Here images get converted and features detected'''
         if VERBOSE :
-            print ('received image of type: "%s"' % ros_data.format)
+            print("received image of type: %s",ros_data.format)
 
         #### direct conversion to CV2 ####
         np_arr = np.fromstring(ros_data.data, np.uint8)
         image_np = cv2.imdecode(np_arr, cv2.CV_LOAD_IMAGE_COLOR)
         #image_np = cv2.imdecode(np_arr, cv2.IMREAD_COLOR) # OpenCV >= 3.0:
+        image_np = self.bridge.compressed_imgmsg_to_cv2(image)
         
         #### Feature detectors using CV2 #### 
         # "","Grid","Pyramid" + 
@@ -69,7 +70,7 @@ class image_feature:
             cv2.cvtColor(image_np, cv2.COLOR_BGR2GRAY))
         time2 = time.time()
         if VERBOSE :
-            print ('%s detector found: %s points in: %s sec.'%(method,
+            print('%s detector found: %s points in: %s sec.'%(method,
                 len(featPoints),time2-time1))
 
         for featpoint in featPoints:
