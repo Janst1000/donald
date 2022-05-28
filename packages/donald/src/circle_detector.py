@@ -36,7 +36,10 @@ class circle_detector():
         circles_img = np.uint16(np.around(circles_img))
 
         #self.image_message = np_arr
-        self.image_message = self.bridge.cv2_to_imgmsg(gray, "passthrough")
+        try:
+           self.image_message = self.bridge.cv2_to_imgmsg(circles_img, "passthrough")
+        except CvBridgeError as e:
+            rospy.loginfo(e)
         self.image_pub.publish(self.image_message)
 
 if __name__ == '__main__':
