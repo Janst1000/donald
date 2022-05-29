@@ -18,9 +18,10 @@ class circle_detector():
         self.veh_name = os.environ['VEHICLE_NAME']
         self.subscriber = rospy.Subscriber("/donald/camera_node/image/compressed", CompressedImage, self.callback, queue_size=1)
 
-        self.node_rate = 1
+        self.node_rate = 15
         # creating publisher
         self.image_pub = rospy.Publisher("/circles", Image, queue_size=1)
+        self.gray_pub = rospy.Publisher("/gray", Image, queue_size=1)
         # initializing cv bridge
         self.bridge = CvBridge()
 
@@ -30,15 +31,16 @@ class circle_detector():
 #            print(e)
 
     def callback(self, ros_data):
-        circle_param1 = rospy.get_param("circle1")
-        circle_param2 = rospy.get_param("circle2")
+        circle_param1 = rospy.get_param("circles/param1")
+        circle_param2 = rospy.get_param("circles/param2")
         # getting image as cv2 object
         camera_image = self.bridge.compressed_imgmsg_to_cv2(ros_data, "bgr8")
         #image_np = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
         # Converting image to grayscale
         gray = cv2.cvtColor(camera_image, cv2.COLOR_BGR2GRAY)
         gray = cv2.medianBlur(gray, 5)
-
+        self.gray_message = self.bridge.cv2_to_imgmsg(gray, "passthrough")
+        self.gray_pub.publish(self.gray_message)
         #corrected = self.correct_Image(camera_image)
 
         #circles = None
@@ -47,7 +49,7 @@ class circle_detector():
         #circles_img = np.uint16(np.around(circles_img))
         circles_img = camera_image
         if circles is not None:
-          circles = np.uint8(np.around(circles))
+          circles = np.uint16(np.around(circles))
           rospy.loginfo(circles)
           for i in circles[0, :]:
               center = (i[0], i[1])
