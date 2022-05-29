@@ -1,47 +1,69 @@
-# Template: template-ros
+# Dynamic Obstacle Avoidance
 
-This template provides a boilerplate repository
-for developing ROS-based software in Duckietown.
+This docker container will detect the LEDs of other duckiebots
 
-**NOTE:** If you want to develop software that does not use
-ROS, check out [this template](https://github.com/duckietown/template-basic).
+## Prerequisites
+
+You should have already completed the camera and wheel calibrations
 
 
 ## How to use it
 
-### 1. Fork this repository
+### 1. Clone this repository
 
-Use the fork button in the top-right corner of the github page to fork this template repository.
+    git clone https://github.com/Janst1000/donald.git
 
+### 2. Get your intrinsics file
 
-### 2. Create a new repository
-
-Create a new repository on github.com while
-specifying the newly forked template repository as
-a template for your new repository.
+Download your camera intrinsics calibration yaml file. We called ours donald_intrinsics.yaml and copy it into
+the /src directoy. Please keep in mind that these are name sensitive and you either need to change the name of yours or change the code.
 
 
-### 3. Define dependencies
+### 3. Build the container on your duckiebot
 
-List the dependencies in the files `dependencies-apt.txt` and
-`dependencies-py3.txt` (apt packages and pip packages respectively).
+Exchange donald.local with your duckiebots name
 
-
-### 4. Place your code
-
-Place your code in the directory `/packages/` of
-your new repository.
+    dts devel build -f -H donald.local
 
 
-### 5. Setup launchers
+### 4. Run the container 
 
-The directory `/launchers` can contain as many launchers (launching scripts)
-as you want. A default launcher called `default.sh` must always be present.
+Exchange donald.local with your duckiebots name
 
-If you create an executable script (i.e., a file with a valid shebang statement)
-a launcher will be created for it. For example, the script file 
-`/launchers/my-launcher.sh` will be available inside the Docker image as the binary
-`dt-launcher-my-launcher`.
+    dts devel run -H donald.local
 
-When launching a new container, you can simply provide `dt-launcher-my-launcher` as
-command.
+### 5. Inspect the results
+
+Open a new terminal and open rqt_image_view and inspect the image topics that are being published
+
+    dts start_gui_tools donald.local
+    rosrun rqt_image_view rqt_image_view
+
+### 6. Tuning (optional)
+
+You can tune the HoughCircles parameters by modifying some rosparameters.
+The following parameters are available with it's default values:
+
+    circles/param1  25
+    circles/param2  25
+    circles/min     0
+    circles/max     15
+    circles/blur    5
+
+You can tune them by using:
+
+    rosparam set /circles/<parameter> <value>
+
+## How it works
+
+### Preprocessing
+
+We subscribe to the /donald/camera_node/image/compressed image and get the raw pictures from the camera.
+We then correct the image using the undistort.rectify() method. This method was taken from the duckietown utils
+library but we had to slightly modify it to read the donald_intrinsics.yaml file correctly.
+
+Once we have the corrected image we convert it to grayscale and and darken it a bit.
+After that we threshold the image and convert it back to grayscale.
+
+We the use opencv's HoughCircles to get all of the circles in the image
+Then the circles are drawn onto the corrected image and can be displayed.
