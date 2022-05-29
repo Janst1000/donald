@@ -13,14 +13,9 @@ dt-launchfile-init
 # NOTE: Use `dt-exec COMMAND` to run the main process (blocking process)
 
 # launching app
-#roscore&
-#sleep 5
-#rosrun donald my_publisher_node.py&
-#dt-exec rosrun donald my_subscriber_node.py
 #dt-exec rosrun donald camera_subscriber_node.py
 #dt-exec rosrun donald image_publisher.py image:=/image_topic&
-rosparam set /circles/param1 75
-rosparam set /circles/param2 50
+
 dt-exec rosrun donald circle_detector.py
 # ----------------------------------------------------------------------------
 # YOUR CODE ABOVE THIS LINE
