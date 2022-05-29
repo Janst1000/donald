@@ -23,7 +23,7 @@ class circle_detector():
         # creating publisher
         self.image_pub = rospy.Publisher("/circles", Image, queue_size=1)
         self.gray_pub = rospy.Publisher("/gray", Image, queue_size=1)
-        #self.bin_pub = rospy.Publisher("/binary_image", Image, queue_size=1)
+        self.bin_pub = rospy.Publisher("/binary_image", Image, queue_size=1)
         # initializing cv bridge
         self.bridge = CvBridge()
         self.intrinsics = undistort.load_camera_intrinsics(self.veh_name)
@@ -47,13 +47,25 @@ class circle_detector():
         gray = cv2.medianBlur(gray, blur)
         gray = cv2.subtract(gray, 50)
         
-        #binary = cv2.threshold(gray,235,255,cv2.THRESH_BINARY)
+        # apply Otsu's automatic thresholding which automatically determines
+        # the best threshold value
+        (T, threshInv) = cv2.threshold(gray, 235, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
+        print("[INFO] otsu's thresholding value: {}".format(T))
+        # visualize only the masked regions in the image
+        masked = cv2.bitwise_and(corrected, corrected, mask=threshInv)
+
+        masked = cv2.cvtColor(masked, cv2.COLOR_BGR2GRAY)
+
+        self.bin_message = self.bridge.cv2_to_imgmsg(masked, "mono8")
+        self.bin_pub.publish(self.bin_message)
+
+
         #publishing the grayscale image
         self.gray_message = self.bridge.cv2_to_imgmsg(gray, "mono8")
         self.gray_pub.publish(self.gray_message)
 
         # Detecting the circles
-        circles = cv2.HoughCircles(gray,cv2.HOUGH_GRADIENT,1,20,
+        circles = cv2.HoughCircles(masked,cv2.HOUGH_GRADIENT,1,20,
                             param1=circle_param1,param2=circle_param2,minRadius=minR,maxRadius=maxR)
         
         # Copying the corrected image for drawing the resulting circles
