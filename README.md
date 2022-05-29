@@ -2,7 +2,7 @@
 
 You should have already completed the camera and wheel calibrations
 
-##Lane Following & How to use
+## Lane Following & How to use
 
 First, check to make sure that dt-duckiebot-interface and dt-car-interface are running on your duckiebot via portainer, if not, do:
 
@@ -84,6 +84,6 @@ After that we threshold the image and convert it back to grayscale.
 We the use opencv's HoughCircles to get all of the circles in the image
 Then the circles are drawn onto the corrected image and can be displayed.
 
-#Simulation Utilizing Duckietown_gym
+# Simulation Utilizing Duckietown_gym
 
 To speed up your work and to train your algos, refer to https://github.com/duckietown/gym-duckietown
