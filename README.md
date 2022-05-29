@@ -11,7 +11,7 @@ You should have already completed the camera and wheel calibrations
 
 ### 1. Clone this repository
 
-    git clone https://github.com/Janst1000/donald.git
+    $ git clone https://github.com/Janst1000/donald.git
 
 ### 2. Get your intrinsics file
 
@@ -23,36 +23,36 @@ the /src directoy. Please keep in mind that these are name sensitive and you eit
 
 Exchange donald.local with your duckiebots name
 
-    dts devel build -f -H donald.local
+    $ dts devel build -f -H donald.local
 
 
 ### 4. Run the container 
 
 Exchange donald.local with your duckiebots name
 
-    dts devel run -H donald.local
+    $ dts devel run -H donald.local
 
 ### 5. Inspect the results
 
 Open a new terminal and open rqt_image_view and inspect the image topics that are being published
 
-    dts start_gui_tools donald.local
-    rosrun rqt_image_view rqt_image_view
+    $ dts start_gui_tools donald.local
+    $ rosrun rqt_image_view rqt_image_view
 
 ### 6. Tuning (optional)
 
 You can tune the HoughCircles parameters by modifying some rosparameters.
 The following parameters are available with it's default values:
 
-    circles/param1  25
-    circles/param2  25
-    circles/min     0
-    circles/max     15
-    circles/blur    5
+    $ circles/param1  25
+    $ circles/param2  25
+    $ circles/min     0
+    $ circles/max     15
+    $ circles/blur    5
 
 You can tune them by using:
 
-    rosparam set /circles/<parameter> <value>
+    $ rosparam set /circles/<parameter> <value>
 
 ## How it works
 
